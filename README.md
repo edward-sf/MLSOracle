@@ -36,6 +36,38 @@ We use [`pytest`](https://docs.pytest.org/en/stable/) (with `pytest-cov`) for te
 uv run pytest
 ```
 
+## Data
+
+A series of API Clients exist in the project, some custom leveraging `requests` and some using our optimized `soccerdata` library.
+
+### MLS Players' Association (MLSPA)
+
+The MLSPA releases annual salary reports for all players in the league. These reports are available from the association's S3 bucket at stable URLs, known to the client. Reports are available from 2007 to the present. Reports from 2007 through 2023 are available in PDF form, while reports from 2024 to the present are already in clean CSV.
+
+#### Accessing a Report
+
+The [MLSPA Client](data/sources/mlspa/client.py) handles request of the report, PDF-parsing with `tabula-py`, data cleaning, and outputs normalized CSV files to `data/sources/mlspa/reports`. These files are intended for local development use and the contents of the `data/sources/mlspa/reports` directory are already .gitignored.
+
+To fetch a report from the MLSPA, run the following from the terminal:
+
+```bash
+uv run data/sources/mlspa/client.py 2022
+```
+
+This will create a normalized CSV file at `data/sources/mlspa/reports/mlspa_salaries_2022.csv` containing the salary data ready for handling and manipulation with `pandas`.
+
+You can fetch multiple reports at once, like so:
+
+```bash
+uv run data/sources/mlspa/client.py 2021 2008 2017
+```
+
+If you omit the year argument, the client will default to the latest supported report.
+
+#### Adding a new report
+
+If you would like to add a new report to the Client, you primarily need to add the URL to `_SALARY_REPORTS` for the corresponding year and add an entry to `_CLEANING_PIPELINES`. Reports since 2024 have maintained a normal CSV format, so you'll likely only need to include `_CSV_DEFAULT_STEPS` for its value. If the format changes, you may need to implement cleaning steps specific to that report's format and add them to that year's cleaning pipeline.
+
 ## Dependencies
 
 We leverage the following libraries. This is not an exhaustive list of dependencies, as each of the following carry their own. This represents a high-level understanding of the tooling deployed for MLS Oracle.

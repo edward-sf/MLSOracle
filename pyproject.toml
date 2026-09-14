@@ -56,8 +56,8 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
-addopts = "--cov=src --cov-report=term-missing"
+pythonpath = ["src", "."]
+addopts = "--cov=src --cov=data/sources --cov-report=term-missing"
 
 [tool.coverage.run]
-source = ["src"]
+source = ["src", "data/sources"]
